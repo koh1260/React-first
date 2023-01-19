@@ -3,36 +3,48 @@ import styles from "./App.module.css";
 import { useState, useEffect } from "react";
 
 function App() {
-  const [toDo, setToDo] = useState("");
-  const [toDos, setToDos] = useState([]);
-  const onChange = (event) => setToDo(event.target.value);
-  const onSubmit = (event) => {
-    event.preventDefault();
-    if (toDo === "") {
-      return;
-    }
-    setToDos((currentArray) => {
-      return [...currentArray, toDo];
-    });
-    setToDo("");
-  };
+  const [loading, setLoading] = useState(true);
+  const [coins, setCoins] = useState([]);
+  const [price, setPrice] = useState(0);
+  const [money, setMoney] = useState(0);
+
+  useEffect(() => {
+    fetch("https://api.coinpaprika.com/v1/tickers")
+      .then((response) => response.json())
+      .then((json) => {
+        setCoins(json);
+        setLoading(false);
+      });
+  }, []);
+
+  console.log(price);
+  console.log(money);
+
   return (
     <div>
-      <h1>My To Dos ({toDos.length})</h1>
-      <form onSubmit={onSubmit}>
-        <input
-          onChange={onChange}
-          value={toDo}
-          type="text"
-          placeholder="Write To do"
-        ></input>
-        <button>Add To Do</button>
-      </form>
-      <hr />
-      <h3>할 일 목록</h3>
-      <ul>
-        {toDos.map((todo, index) => <li>{todo}</li>)}
-      </ul>
+      <h1>To Coins! ({coins.length})</h1>
+      {loading ? (
+        <strong>Loading. . .</strong>
+      ) : (
+        <div>
+          <input
+            onChange={(event) => setMoney(event.target.value)}
+            type="number"
+            placeholder="USD"
+          />
+          <button onClick={()=>setMoney(0)}>Reset</button>
+          <br /><br />
+          <select onChange={(event) => setPrice(event.target.value)}>
+            <option value={0}>Select Coin . . .</option>
+            {coins.map((coin) => (
+              <option key={coin.id} value={coin.quotes.USD.price}>
+                {coin.name} ({coin.symbol}) ({coin.quotes.USD.price})
+              </option>
+            ))}
+          </select>
+          <h3>{money / price} 개</h3>
+        </div>
+      )}
     </div>
   );
 }
