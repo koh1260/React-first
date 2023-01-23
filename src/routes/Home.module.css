@@ -1,0 +1,8 @@
+.movie{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+body{
+    margin: 0;
+    background-color: #eff3f7;
+}
